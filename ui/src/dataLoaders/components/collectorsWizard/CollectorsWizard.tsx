@@ -22,11 +22,7 @@ import {clearDataLoaders} from 'src/dataLoaders/actions/dataLoaders'
 
 // Types
 import {Links} from 'src/types/v2/links'
-import {
-  DataLoadersState,
-  DataLoaderType,
-  Substep,
-} from 'src/types/v2/dataLoaders'
+import {Substep, TelegrafPlugin} from 'src/types/v2/dataLoaders'
 import {Notification, NotificationFunc} from 'src/types'
 import {AppState} from 'src/types/v2'
 import {Bucket} from 'src/api'
@@ -42,11 +38,8 @@ export interface CollectorsStepProps {
 interface OwnProps {
   onCompleteSetup: () => void
   visible: boolean
-  bucket?: Bucket
   buckets: Bucket[]
-  startingType?: DataLoaderType
   startingStep?: number
-  startingSubstep?: Substep
 }
 
 interface DispatchProps {
@@ -61,11 +54,11 @@ interface DispatchProps {
 
 interface StateProps {
   links: Links
-  dataLoaders: DataLoadersState
+  telegrafPlugins: TelegrafPlugin[]
   currentStepIndex: number
   substep: Substep
   username: string
-  selectedBucket: string
+  bucket: string
 }
 
 type Props = OwnProps & StateProps & DispatchProps
@@ -87,7 +80,7 @@ class CollectorsWizard extends PureComponent<Props> {
   }
 
   public render() {
-    const {visible, buckets} = this.props
+    const {visible, buckets, telegrafPlugins} = this.props
 
     return (
       <WizardOverlay
@@ -96,6 +89,13 @@ class CollectorsWizard extends PureComponent<Props> {
         onDismis={this.handleDismiss}
       >
         <div className="wizard-contents">
+          <PluginsSideBar
+            telegrafPlugins={telegrafPlugins}
+            onTabClick={this.handleClickSideBarTab}
+            title="Plugins to Configure"
+            visible={this.sideBarVisible}
+            currentStepIndex={currentStepIndex}
+          />
           <div className="wizard-step--container">
             <CollectorsStepSwitcher
               stepProps={this.stepProps}
@@ -132,6 +132,47 @@ class CollectorsWizard extends PureComponent<Props> {
     this.props.onClearSteps()
   }
 
+  private get sideBarVisible() {
+    const {dataLoaders, currentStepIndex} = this.props
+    const {telegrafPlugins, type} = dataLoaders
+
+    const isStreaming = type === DataLoaderType.Streaming
+    const isNotEmpty = telegrafPlugins.length > 0
+    const isConfigStep = currentStepIndex > 0
+
+    return isStreaming && isNotEmpty && isConfigStep
+  }
+
+  private handleClickSideBarTab = (tabID: string) => {
+    const {
+      onSetSubstepIndex,
+      onSetActiveTelegrafPlugin,
+      dataLoaders: {telegrafPlugins},
+      substep,
+      onSetPluginConfiguration,
+    } = this.props
+
+    if (!_.isNaN(Number(substep))) {
+      onSetPluginConfiguration(_.get(telegrafPlugins, `${substep}.name`, ''))
+    }
+
+    if (tabID === 'config') {
+      onSetSubstepIndex(DataLoaderStep.Configure, tabID)
+      onSetActiveTelegrafPlugin('')
+      return
+    }
+
+    const index = Math.max(
+      _.findIndex(telegrafPlugins, plugin => {
+        return plugin.name === tabID
+      }),
+      0
+    )
+
+    onSetSubstepIndex(DataLoaderStep.Configure, index)
+    onSetActiveTelegrafPlugin(tabID)
+  }
+
   private get stepProps(): CollectorsStepProps {
     const {
       notify,
@@ -153,17 +194,17 @@ class CollectorsWizard extends PureComponent<Props> {
 const mstp = ({
   links,
   dataLoading: {
-    dataLoaders,
+    dataLoaders: {telegrafPlugins},
     steps: {currentStep, substep, bucket},
   },
   me: {name},
 }: AppState): StateProps => ({
   links,
-  dataLoaders,
+  telegrafPlugins,
   currentStepIndex: currentStep,
   substep,
   username: name,
-  selectedBucket: bucket,
+  bucket,
 })
 
 const mdtp: DispatchProps = {

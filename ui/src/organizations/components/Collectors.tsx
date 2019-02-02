@@ -1,6 +1,7 @@
 // Libraries
 import _ from 'lodash'
 import React, {PureComponent, ChangeEvent} from 'react'
+import {connect} from 'react-redux'
 
 // Utils
 import {downloadTextFile} from 'src/shared/utils/download'
@@ -20,7 +21,7 @@ import {
   Input,
   InputType,
 } from 'src/clockface'
-import DataLoadersWizard from 'src/dataLoaders/components/DataLoadersWizard'
+import CollectorsWizard from 'src/dataLoaders/components/collectorsWizard/CollectorsWizard'
 import FilterList from 'src/shared/components/Filter'
 
 // APIS
@@ -32,6 +33,7 @@ import {
 // Actions
 import * as NotificationsActions from 'src/types/actions/notifications'
 import {notify} from 'src/shared/actions/notifications'
+import {setBucketInfo} from 'src/dataLoaders/actions/steps'
 
 // Constants
 import {getTelegrafConfigFailed} from 'src/shared/copy/v2/notifications'
@@ -41,10 +43,9 @@ import {ErrorHandling} from 'src/shared/decorators/errors'
 
 // Types
 import {Telegraf, Bucket} from 'src/api'
-import {DataLoaderType, DataLoaderStep} from 'src/types/v2/dataLoaders'
 import {OverlayState} from 'src/types/v2'
 
-interface Props {
+interface OwnProps {
   collectors: Telegraf[]
   onChange: () => void
   notify: NotificationsActions.PublishNotificationActionCreator
@@ -52,13 +53,19 @@ interface Props {
   buckets: Bucket[]
 }
 
+interface DispatchProps {
+  onSetBucketInfo: typeof setBucketInfo
+}
+
+type Props = OwnProps & DispatchProps
+
 interface State {
   overlayState: OverlayState
   searchTerm: string
 }
 
 @ErrorHandling
-export default class Collectors extends PureComponent<Props, State> {
+export class Collectors extends PureComponent<Props, State> {
   constructor(props: Props) {
     super(props)
 
@@ -114,12 +121,10 @@ export default class Collectors extends PureComponent<Props, State> {
             </Grid.Column>
           </Grid.Row>
         </Grid>
-        <DataLoadersWizard
+        <CollectorsWizard
           visible={this.isOverlayVisible}
           onCompleteSetup={this.handleDismissDataLoaders}
-          startingType={DataLoaderType.Streaming}
-          startingStep={DataLoaderStep.Select}
-          startingSubstep={'streaming'}
+          startingStep={0}
           buckets={buckets}
         />
       </>
@@ -136,12 +141,18 @@ export default class Collectors extends PureComponent<Props, State> {
         text="Create Configuration"
         icon={IconFont.Plus}
         color={ComponentColor.Primary}
-        onClick={this.handleAddScraper}
+        onClick={this.handleAddCollector}
       />
     )
   }
 
-  private handleAddScraper = () => {
+  private handleAddCollector = () => {
+    const {buckets, onSetBucketInfo} = this.props
+
+    if (buckets && buckets.length) {
+      const {organization, organizationID, name, id} = buckets[0]
+      onSetBucketInfo(organization, organizationID, name, id)
+    }
     this.setState({overlayState: OverlayState.Open})
   }
 
@@ -184,6 +195,7 @@ export default class Collectors extends PureComponent<Props, State> {
       notify(getTelegrafConfigFailed())
     }
   }
+
   private handleDeleteTelegraf = async (telegrafID: string) => {
     await deleteTelegrafConfig(telegrafID)
     this.props.onChange()
@@ -197,3 +209,12 @@ export default class Collectors extends PureComponent<Props, State> {
     this.setState({searchTerm: e.target.value})
   }
 }
+
+const mdtp: DispatchProps = {
+  onSetBucketInfo: setBucketInfo,
+}
+
+export default connect<null, DispatchProps, OwnProps>(
+  null,
+  mdtp
+)(Collectors)

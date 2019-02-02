@@ -127,7 +127,7 @@ class StreamingSelector extends PureComponent<Props, State> {
   }
 
   private get selectedBucketID(): string {
-    return _.get(this.props.bucket, 'name', 'empty')
+    return this.props.bucket || 'empty'
   }
 
   private get dropdownBuckets(): JSX.Element[] {
