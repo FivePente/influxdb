@@ -3,7 +3,7 @@ import React from 'react'
 import {shallow} from 'enzyme'
 
 // Components
-import DataListening from 'src/dataLoaders/components/collectorsWizard/verify/DataListening'
+import DataListening from 'src/dataLoaders/components/verifyStep/DataListening'
 import ConnectionInformation from 'src/dataLoaders/components/collectorsWizard/verify/ConnectionInformation'
 import {Button} from 'src/clockface'
 

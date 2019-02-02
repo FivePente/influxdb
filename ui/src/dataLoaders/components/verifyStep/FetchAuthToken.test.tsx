@@ -3,27 +3,24 @@ import React from 'react'
 import {shallow} from 'enzyme'
 
 // Components
-import {CreateOrUpdateConfig} from 'src/dataLoaders/components/collectorsWizard/verify/CreateOrUpdateConfig'
+import FetchAuthToken from 'src/dataLoaders/components/verifyStep/FetchAuthToken'
 
 jest.mock('src/utils/api', () => require('src/onboarding/apis/mocks'))
 
 const setup = async (override = {}) => {
   const props = {
-    org: 'default',
+    bucket: '',
+    username: '',
     children: jest.fn(),
-    onSaveTelegrafConfig: jest.fn(),
-    createDashboardsForPlugins: jest.fn(),
-    notify: jest.fn(),
-    authToken: '',
     ...override,
   }
 
-  const wrapper = await shallow(<CreateOrUpdateConfig {...props} />)
+  const wrapper = await shallow(<FetchAuthToken {...props} />)
 
   return {wrapper}
 }
 
-describe('CreateOrUpdateConfig', () => {
+describe('FetchAuthToken', () => {
   it('renders', async () => {
     const {wrapper} = await setup()
     expect(wrapper.exists()).toBe(true)

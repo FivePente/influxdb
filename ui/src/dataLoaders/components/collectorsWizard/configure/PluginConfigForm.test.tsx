@@ -3,7 +3,7 @@ import React from 'react'
 import {mount} from 'enzyme'
 
 // Components
-import ConfigFieldSwitcher from 'src/dataLoaders/components/collectorsWizard/configure/ConfigFieldSwitcher'
+import ConfigFieldSwitcher from 'src/dataLoaders/components/configureStep/streaming/ConfigFieldSwitcher'
 import {PluginConfigForm} from 'src/dataLoaders/components/collectorsWizard/configure/PluginConfigForm'
 import {Form} from 'src/clockface'
 import OnboardingButtons from 'src/onboarding/components/OnboardingButtons'

@@ -3,8 +3,8 @@ import React from 'react'
 import {shallow, mount} from 'enzyme'
 
 // Components
-import ConfigFieldSwitcher from 'src/dataLoaders/components/collectorsWizard/configure/ConfigFieldSwitcher'
-import ArrayFormElement from 'src/dataLoaders/components/collectorsWizard/configure/ArrayFormElement'
+import ConfigFieldSwitcher from 'src/dataLoaders/components/configureStep/streaming/ConfigFieldSwitcher'
+import ArrayFormElement from 'src/dataLoaders/components/configureStep/streaming/ArrayFormElement'
 import URIFormElement from 'src/shared/components/URIFormElement'
 import {Input, FormElement} from 'src/clockface'
 

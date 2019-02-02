@@ -5,8 +5,8 @@ import _ from 'lodash'
 
 // Components
 import {ErrorHandling} from 'src/shared/decorators/errors'
-import DataStreaming from 'src/dataLoaders/components/collectorsWizard/verify/DataStreaming'
-import FetchAuthToken from 'src/dataLoaders/components/collectorsWizard/verify/FetchAuthToken'
+import DataStreaming from 'src/dataLoaders/components/verifyStep/DataStreaming'
+import FetchAuthToken from 'src/dataLoaders/components/verifyStep/FetchAuthToken'
 import OnboardingButtons from 'src/onboarding/components/OnboardingButtons'
 import FancyScrollbar from 'src/shared/components/fancy_scrollbar/FancyScrollbar'
 

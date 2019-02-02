@@ -5,7 +5,7 @@ import {shallow} from 'enzyme'
 // Components
 import ConnectionInformation, {
   LoadingState,
-} from 'src/dataLoaders/components/collectorsWizard/verify/ConnectionInformation'
+} from 'src/dataLoaders/components/verifyStep/ConnectionInformation'
 
 // Types
 
