@@ -6,7 +6,7 @@ import _ from 'lodash'
 // Components
 import {ErrorHandling} from 'src/shared/decorators/errors'
 import WizardOverlay from 'src/clockface/components/wizard/WizardOverlay'
-import CollectorsStepSwitcher from 'src/dataLoaders/components/CollectorsStepSwitcher'
+import CollectorsStepSwitcher from 'src/dataLoaders/components/collectorsWizard/CollectorsStepSwitcher'
 
 // Actions
 import {notify as notifyAction} from 'src/shared/actions/notifications'
@@ -15,22 +15,10 @@ import {
   incrementCurrentStepIndex,
   decrementCurrentStepIndex,
   setCurrentStepIndex,
-  setSubstepIndex,
   clearSteps,
 } from 'src/dataLoaders/actions/steps'
 
-import {
-  setDataLoadersType,
-  updateTelegrafPluginConfig,
-  addConfigValue,
-  removeConfigValue,
-  setActiveTelegrafPlugin,
-  setPluginConfiguration,
-  addPluginBundleWithPlugins,
-  removePluginBundleWithPlugins,
-  setConfigArrayValue,
-  clearDataLoaders,
-} from 'src/dataLoaders/actions/dataLoaders'
+import {clearDataLoaders} from 'src/dataLoaders/actions/dataLoaders'
 
 // Types
 import {Links} from 'src/types/v2/links'
@@ -43,16 +31,11 @@ import {Notification, NotificationFunc} from 'src/types'
 import {AppState} from 'src/types/v2'
 import {Bucket} from 'src/api'
 
-export interface DataLoaderStepProps {
-  links: Links
+export interface CollectorsStepProps {
   currentStepIndex: number
-  substep: Substep
-  onSetCurrentStepIndex: (stepNumber: number) => void
   onIncrementCurrentStepIndex: () => void
   onDecrementCurrentStepIndex: () => void
-  onSetSubstepIndex: (index: number, subStep: Substep) => void
   notify: (message: Notification | NotificationFunc) => void
-  onCompleteSetup: () => void
   onExit: () => void
 }
 
@@ -69,19 +52,9 @@ interface OwnProps {
 interface DispatchProps {
   notify: (message: Notification | NotificationFunc) => void
   onSetBucketInfo: typeof setBucketInfo
-  onSetDataLoadersType: typeof setDataLoadersType
-  onAddPluginBundle: typeof addPluginBundleWithPlugins
-  onRemovePluginBundle: typeof removePluginBundleWithPlugins
-  onUpdateTelegrafPluginConfig: typeof updateTelegrafPluginConfig
-  onAddConfigValue: typeof addConfigValue
-  onRemoveConfigValue: typeof removeConfigValue
-  onSetActiveTelegrafPlugin: typeof setActiveTelegrafPlugin
-  onSetPluginConfiguration: typeof setPluginConfiguration
-  onSetConfigArrayValue: typeof setConfigArrayValue
   onIncrementCurrentStepIndex: typeof incrementCurrentStepIndex
   onDecrementCurrentStepIndex: typeof decrementCurrentStepIndex
   onSetCurrentStepIndex: typeof setCurrentStepIndex
-  onSetSubstepIndex: typeof setSubstepIndex
   onClearDataLoaders: typeof clearDataLoaders
   onClearSteps: typeof clearSteps
 }
@@ -114,25 +87,7 @@ class CollectorsWizard extends PureComponent<Props> {
   }
 
   public render() {
-    const {
-      currentStepIndex,
-      dataLoaders,
-      onSetDataLoadersType,
-      onSetActiveTelegrafPlugin,
-      onSetPluginConfiguration,
-      onUpdateTelegrafPluginConfig,
-      onAddConfigValue,
-      onRemoveConfigValue,
-      onAddPluginBundle,
-      onRemovePluginBundle,
-      onSetConfigArrayValue,
-      visible,
-      bucket,
-      username,
-      onSetBucketInfo,
-      buckets,
-      selectedBucket,
-    } = this.props
+    const {visible, buckets} = this.props
 
     return (
       <WizardOverlay
@@ -143,23 +98,7 @@ class CollectorsWizard extends PureComponent<Props> {
         <div className="wizard-contents">
           <div className="wizard-step--container">
             <CollectorsStepSwitcher
-              currentStepIndex={currentStepIndex}
-              onboardingStepProps={this.stepProps}
-              bucketName={_.get(bucket, 'name', '')}
-              selectedBucket={selectedBucket}
-              dataLoaders={dataLoaders}
-              onSetDataLoadersType={onSetDataLoadersType}
-              onUpdateTelegrafPluginConfig={onUpdateTelegrafPluginConfig}
-              onSetActiveTelegrafPlugin={onSetActiveTelegrafPlugin}
-              onSetPluginConfiguration={onSetPluginConfiguration}
-              onAddConfigValue={onAddConfigValue}
-              onRemoveConfigValue={onRemoveConfigValue}
-              onAddPluginBundle={onAddPluginBundle}
-              onRemovePluginBundle={onRemovePluginBundle}
-              onSetConfigArrayValue={onSetConfigArrayValue}
-              onSetBucketInfo={onSetBucketInfo}
-              org={_.get(bucket, 'organization', '')}
-              username={username}
+              stepProps={this.stepProps}
               buckets={buckets}
             />
           </div>
@@ -170,32 +109,19 @@ class CollectorsWizard extends PureComponent<Props> {
 
   private handleSetBucketInfo = () => {
     const {bucket, buckets} = this.props
-    if (bucket || (buckets && buckets.length)) {
-      const b = bucket || buckets[0]
-      const {organization, organizationID, name, id} = b
+    if (!bucket && (buckets && buckets.length)) {
+      const {organization, organizationID, name, id} = buckets[0]
 
       this.props.onSetBucketInfo(organization, organizationID, name, id)
     }
   }
 
   private handleSetStartingValues = () => {
-    const {startingStep, startingType, startingSubstep} = this.props
+    const {startingStep} = this.props
 
     const hasStartingStep = startingStep || startingStep === 0
-    const hasStartingSubstep = startingSubstep || startingSubstep === 0
-    const hasStartingType =
-      startingType || startingType === DataLoaderType.Empty
 
-    if (hasStartingType) {
-      this.props.onSetDataLoadersType(startingType)
-    }
-
-    if (hasStartingSubstep) {
-      this.props.onSetSubstepIndex(
-        hasStartingStep ? startingStep : 0,
-        startingSubstep
-      )
-    } else if (hasStartingStep) {
+    if (hasStartingStep) {
       this.props.onSetCurrentStepIndex(startingStep)
     }
   }
@@ -206,29 +132,19 @@ class CollectorsWizard extends PureComponent<Props> {
     this.props.onClearSteps()
   }
 
-  private get stepProps(): DataLoaderStepProps {
+  private get stepProps(): CollectorsStepProps {
     const {
-      links,
       notify,
-      substep,
-      onCompleteSetup,
       currentStepIndex,
-      onSetCurrentStepIndex,
-      onSetSubstepIndex,
       onDecrementCurrentStepIndex,
       onIncrementCurrentStepIndex,
     } = this.props
 
     return {
-      substep,
       currentStepIndex,
-      onSetCurrentStepIndex,
-      onSetSubstepIndex,
       onIncrementCurrentStepIndex,
       onDecrementCurrentStepIndex,
-      links,
       notify,
-      onCompleteSetup,
       onExit: this.handleDismiss,
     }
   }
@@ -253,19 +169,9 @@ const mstp = ({
 const mdtp: DispatchProps = {
   notify: notifyAction,
   onSetBucketInfo: setBucketInfo,
-  onSetDataLoadersType: setDataLoadersType,
-  onUpdateTelegrafPluginConfig: updateTelegrafPluginConfig,
-  onAddConfigValue: addConfigValue,
-  onRemoveConfigValue: removeConfigValue,
-  onSetActiveTelegrafPlugin: setActiveTelegrafPlugin,
-  onAddPluginBundle: addPluginBundleWithPlugins,
-  onRemovePluginBundle: removePluginBundleWithPlugins,
-  onSetPluginConfiguration: setPluginConfiguration,
-  onSetConfigArrayValue: setConfigArrayValue,
   onIncrementCurrentStepIndex: incrementCurrentStepIndex,
   onDecrementCurrentStepIndex: decrementCurrentStepIndex,
   onSetCurrentStepIndex: setCurrentStepIndex,
-  onSetSubstepIndex: setSubstepIndex,
   onClearDataLoaders: clearDataLoaders,
   onClearSteps: clearSteps,
 }

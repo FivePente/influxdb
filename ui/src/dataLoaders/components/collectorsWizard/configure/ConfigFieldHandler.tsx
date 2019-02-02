@@ -1,9 +1,10 @@
 // Libraries
 import React, {PureComponent, ChangeEvent} from 'react'
+import {connect} from 'react-redux'
 import _ from 'lodash'
 
 // Components
-import ConfigFieldSwitcher from 'src/dataLoaders/components/configureStep/streaming/ConfigFieldSwitcher'
+import ConfigFieldSwitcher from 'src/dataLoaders/components/collectorsWizard/configure/ConfigFieldSwitcher'
 
 // Actions
 import {
@@ -20,14 +21,19 @@ import {
   ConfigFieldType,
 } from 'src/types/v2/dataLoaders'
 
-interface Props {
+interface OwnProps {
   configFields: ConfigFields
   telegrafPlugin: TelegrafPlugin
-  onSetConfigArrayValue: typeof setConfigArrayValue
+}
+
+interface DispatchProps {
+  onUpdateTelegrafPluginConfig: typeof updateTelegrafPluginConfig
   onAddConfigValue: typeof addConfigValue
   onRemoveConfigValue: typeof removeConfigValue
-  onUpdateTelegrafPluginConfig: typeof updateTelegrafPluginConfig
+  onSetConfigArrayValue: typeof setConfigArrayValue
 }
+
+type Props = OwnProps & DispatchProps
 
 class ConfigFieldHandler extends PureComponent<Props> {
   public render() {
@@ -101,4 +107,15 @@ class ConfigFieldHandler extends PureComponent<Props> {
     onUpdateTelegrafPluginConfig(telegrafPlugin.name, name, value)
   }
 }
-export default ConfigFieldHandler
+
+const mdtp: DispatchProps = {
+  onUpdateTelegrafPluginConfig: updateTelegrafPluginConfig,
+  onAddConfigValue: addConfigValue,
+  onRemoveConfigValue: removeConfigValue,
+  onSetConfigArrayValue: setConfigArrayValue,
+}
+
+export default connect<null, DispatchProps, OwnProps>(
+  null,
+  mdtp
+)(ConfigFieldHandler)

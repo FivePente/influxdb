@@ -3,7 +3,7 @@ import React from 'react'
 import {shallow} from 'enzyme'
 
 // Components
-import ArrayFormElement from 'src/dataLoaders/components/configureStep/streaming/ArrayFormElement'
+import ArrayFormElement from 'src/dataLoaders/components/collectorsWizard/configure/ArrayFormElement'
 import {MultipleInput} from 'src/clockface'
 
 import {TelegrafPluginInputCpu} from 'src/api'

@@ -6,7 +6,7 @@ import _ from 'lodash'
 // Components
 import {ErrorHandling} from 'src/shared/decorators/errors'
 import {ComponentStatus, Form} from 'src/clockface'
-import StreamingSelector from 'src/dataLoaders/components/selectionStep/StreamingSelector'
+import StreamingSelector from 'src/dataLoaders/components/collectorsWizard/select/StreamingSelector'
 import OnboardingButtons from 'src/onboarding/components/OnboardingButtons'
 import FancyScrollbar from 'src/shared/components/fancy_scrollbar/FancyScrollbar'
 
@@ -19,7 +19,7 @@ import {
 import {setBucketInfo} from 'src/dataLoaders/actions/steps'
 
 // Types
-import {DataLoaderStepProps} from 'src/dataLoaders/components/DataLoadersWizard'
+import {CollectorsStepProps} from 'src/dataLoaders/components/collectorsWizard/CollectorsWizard'
 import {
   TelegrafPlugin,
   DataLoaderType,
@@ -28,13 +28,12 @@ import {
 import {Bucket} from 'src/api'
 import {AppState} from 'src/types/v2'
 
-export interface OwnProps extends DataLoaderStepProps {
-  pluginBundles: BundleName[]
-  type: DataLoaderType
+export interface OwnProps extends CollectorsStepProps {
   buckets: Bucket[]
 }
 
 export interface StateProps {
+  type: DataLoaderType
   bucket: string
   telegrafPlugins: TelegrafPlugin[]
   pluginBundles: BundleName[]
@@ -50,7 +49,7 @@ export interface DispatchProps {
 type Props = OwnProps & StateProps & DispatchProps
 
 @ErrorHandling
-export class SelectDataSourceStep extends PureComponent<Props> {
+export class SelectCollectorsStep extends PureComponent<Props> {
   public componentDidMount() {
     if (this.props.type !== DataLoaderType.Streaming) {
       this.props.onSetDataLoadersType(DataLoaderType.Streaming)
@@ -60,7 +59,7 @@ export class SelectDataSourceStep extends PureComponent<Props> {
   public render() {
     return (
       <div className="onboarding-step">
-        <Form onSubmit={this.handleClickNext}>
+        <Form onSubmit={this.props.onIncrementCurrentStepIndex}>
           <div className="wizard-step--scroll-area">
             <FancyScrollbar autoHide={false}>
               <div className="wizard-step--scroll-content">
@@ -117,12 +116,6 @@ export class SelectDataSourceStep extends PureComponent<Props> {
     this.props.onSetBucketInfo(organization, organizationID, name, id)
   }
 
-  private handleClickNext = () => {
-    const {currentStepIndex, onSetSubstepIndex} = this.props
-
-    onSetSubstepIndex(currentStepIndex + 1, 'config')
-  }
-
   private handleTogglePluginBundle = (
     bundle: BundleName,
     isSelected: boolean
@@ -139,10 +132,11 @@ export class SelectDataSourceStep extends PureComponent<Props> {
 
 const mstp = ({
   dataLoading: {
-    dataLoaders: {telegrafPlugins, pluginBundles},
+    dataLoaders: {telegrafPlugins, pluginBundles, type},
     steps: {bucket},
   },
 }: AppState): StateProps => ({
+  type,
   telegrafPlugins,
   bucket,
   pluginBundles,
@@ -158,4 +152,4 @@ const mdtp: DispatchProps = {
 export default connect<StateProps, DispatchProps, OwnProps>(
   mstp,
   mdtp
-)(SelectDataSourceStep)
+)(SelectCollectorsStep)

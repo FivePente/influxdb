@@ -3,8 +3,8 @@ import React from 'react'
 import {mount} from 'enzyme'
 
 // Components
-import ConfigFieldSwitcher from 'src/dataLoaders/components/configureStep/streaming/ConfigFieldSwitcher'
-import PluginConfigForm from 'src/dataLoaders/components/configureStep/streaming/PluginConfigForm'
+import ConfigFieldSwitcher from 'src/dataLoaders/components/collectorsWizard/configure/ConfigFieldSwitcher'
+import {PluginConfigForm} from 'src/dataLoaders/components/collectorsWizard/configure/PluginConfigForm'
 import {Form} from 'src/clockface'
 import OnboardingButtons from 'src/onboarding/components/OnboardingButtons'
 
@@ -26,6 +26,7 @@ const setup = (override = {}) => {
     authToken: '',
     onSetConfigArrayValue: jest.fn(),
     telegrafPluginName: TelegrafPluginInputCpu.NameEnum.Cpu,
+    onSetActiveTelegrafPlugin: jest.fn(),
     onClickPrevious: jest.fn(),
     onClickSkip: jest.fn(),
     onClickNext: jest.fn(),
@@ -39,7 +40,7 @@ const setup = (override = {}) => {
   return {wrapper}
 }
 
-describe('Onboarding.Components.ConfigureStep.Streaming.PluginConfigForm', () => {
+describe('DataLoaders.Components.CollectorsWizard.Configure.PluginConfigForm', () => {
   describe('if configFields have no keys', () => {
     it('renders text and buttons', () => {
       const {wrapper} = setup({
@@ -47,6 +48,7 @@ describe('Onboarding.Components.ConfigureStep.Streaming.PluginConfigForm', () =>
         configFields:
           telegrafPluginsInfo[TelegrafPluginInputCpu.NameEnum.Cpu].fields,
       })
+      console.log(wrapper.debug())
       const form = wrapper.find(Form)
       const title = wrapper.find('h3')
       const onboardingButtons = wrapper.find(OnboardingButtons)

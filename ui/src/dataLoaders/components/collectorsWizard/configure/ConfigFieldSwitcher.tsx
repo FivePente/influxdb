@@ -5,7 +5,7 @@ import _ from 'lodash'
 // Components
 import {Form, Input, ComponentSize, Grid, Columns} from 'src/clockface'
 import URIFormElement from 'src/shared/components/URIFormElement'
-import ArrayFormElement from 'src/dataLoaders/components/configureStep/streaming/ArrayFormElement'
+import ArrayFormElement from 'src/dataLoaders/components/collectorsWizard/configure/ArrayFormElement'
 
 // Types
 import {ConfigFieldType, TelegrafPluginName} from 'src/types/v2/dataLoaders'

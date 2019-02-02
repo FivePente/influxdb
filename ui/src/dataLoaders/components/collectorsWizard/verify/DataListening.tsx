@@ -15,7 +15,7 @@ import {
 } from 'src/clockface'
 import ConnectionInformation, {
   LoadingState,
-} from 'src/dataLoaders/components/verifyStep/ConnectionInformation'
+} from 'src/dataLoaders/components/collectorsWizard/verify/ConnectionInformation'
 
 // Types
 import {InfluxLanguage} from 'src/types/v2/dashboards'

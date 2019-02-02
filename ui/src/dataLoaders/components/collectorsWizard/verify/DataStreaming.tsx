@@ -3,9 +3,9 @@ import React, {PureComponent} from 'react'
 import _ from 'lodash'
 
 // Components
-import TelegrafInstructions from 'src/dataLoaders/components/verifyStep/TelegrafInstructions'
-import CreateOrUpdateConfig from 'src/dataLoaders/components/verifyStep/CreateOrUpdateConfig'
-import DataListening from 'src/dataLoaders/components/verifyStep/DataListening'
+import TelegrafInstructions from 'src/dataLoaders/components/collectorsWizard/verify/TelegrafInstructions'
+import CreateOrUpdateConfig from 'src/dataLoaders/components/collectorsWizard/verify/CreateOrUpdateConfig'
+import DataListening from 'src/dataLoaders/components/collectorsWizard/verify/DataListening'
 
 // Decorator
 import {ErrorHandling} from 'src/shared/decorators/errors'

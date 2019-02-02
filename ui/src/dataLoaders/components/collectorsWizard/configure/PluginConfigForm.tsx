@@ -1,52 +1,42 @@
 // Libraries
 import React, {PureComponent} from 'react'
+import {connect} from 'react-redux'
 import _ from 'lodash'
 
 // Components
 import {Form} from 'src/clockface'
-import ConfigFieldHandler from 'src/dataLoaders/components/configureStep/streaming/ConfigFieldHandler'
+import ConfigFieldHandler from 'src/dataLoaders/components/collectorsWizard/configure/ConfigFieldHandler'
 import FancyScrollbar from 'src/shared/components/fancy_scrollbar/FancyScrollbar'
 
 // Actions
-import {
-  updateTelegrafPluginConfig,
-  addConfigValue,
-  removeConfigValue,
-  setConfigArrayValue,
-} from 'src/dataLoaders/actions/dataLoaders'
+import {setActiveTelegrafPlugin} from 'src/dataLoaders/actions/dataLoaders'
 
 // Types
 import {TelegrafPlugin, ConfigFields} from 'src/types/v2/dataLoaders'
 import OnboardingButtons from 'src/onboarding/components/OnboardingButtons'
 
-interface Props {
+interface OwnProps {
   telegrafPlugin: TelegrafPlugin
   configFields: ConfigFields
-  onUpdateTelegrafPluginConfig: typeof updateTelegrafPluginConfig
-  onAddConfigValue: typeof addConfigValue
-  onRemoveConfigValue: typeof removeConfigValue
-  onSetConfigArrayValue: typeof setConfigArrayValue
-  onClickNext: () => void
-  telegrafPlugins: TelegrafPlugin[]
 }
 
-class PluginConfigForm extends PureComponent<Props> {
+interface DispatchProps {
+  onSetActiveTelegrafPlugin: typeof setActiveTelegrafPlugin
+}
+
+type Props = OwnProps & DispatchProps
+
+export class PluginConfigForm extends PureComponent<Props> {
   public render() {
-    const {
-      telegrafPlugin: {name},
-      configFields,
-      telegrafPlugin,
-      onSetConfigArrayValue,
-      onAddConfigValue,
-      onRemoveConfigValue,
-      onUpdateTelegrafPluginConfig,
-    } = this.props
+    const {configFields, telegrafPlugin} = this.props
     return (
-      <Form onSubmit={this.props.onClickNext}>
+      <Form onSubmit={this.handleSubmitForm}>
         <div className="wizard-step--scroll-area">
           <FancyScrollbar autoHide={false}>
             <div className="wizard-step--scroll-content">
-              <h3 className="wizard-step--title">{_.startCase(name)}</h3>
+              <h3 className="wizard-step--title">
+                {_.startCase(telegrafPlugin.name)}
+              </h3>
               <h5 className="wizard-step--sub-title">
                 For more information about this plugin, see{' '}
                 <a
@@ -59,10 +49,6 @@ class PluginConfigForm extends PureComponent<Props> {
               <ConfigFieldHandler
                 configFields={configFields}
                 telegrafPlugin={telegrafPlugin}
-                onSetConfigArrayValue={onSetConfigArrayValue}
-                onAddConfigValue={onAddConfigValue}
-                onRemoveConfigValue={onRemoveConfigValue}
-                onUpdateTelegrafPluginConfig={onUpdateTelegrafPluginConfig}
               />
             </div>
           </FancyScrollbar>
@@ -71,10 +57,22 @@ class PluginConfigForm extends PureComponent<Props> {
       </Form>
     )
   }
+
   private get autoFocus(): boolean {
     const {configFields} = this.props
     return !configFields
   }
+
+  private handleSubmitForm = () => {
+    this.props.onSetActiveTelegrafPlugin('')
+  }
 }
 
-export default PluginConfigForm
+const mdtp: DispatchProps = {
+  onSetActiveTelegrafPlugin: setActiveTelegrafPlugin,
+}
+
+export default connect<null, DispatchProps, OwnProps>(
+  null,
+  mdtp
+)(PluginConfigForm)

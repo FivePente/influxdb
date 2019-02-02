@@ -3,8 +3,8 @@ import React from 'react'
 import {shallow} from 'enzyme'
 
 // Components
-import SelectCollectorsStep from 'src/dataLoaders/components/selectionStep/SelectCollectorsStep'
-import StreamingSelector from 'src/dataLoaders/components/selectionStep/StreamingSelector'
+import {SelectCollectorsStep} from 'src/dataLoaders/components/collectorsWizard/select/SelectCollectorsStep'
+import StreamingSelector from 'src/dataLoaders/components/collectorsWizard/select/StreamingSelector'
 import {ComponentStatus} from 'src/clockface'
 
 // Types
@@ -43,7 +43,7 @@ const setup = (override = {}) => {
   return shallow(<SelectCollectorsStep {...props} />)
 }
 
-describe('DataLoaders.Components.SelectionStep.SelectCollectorsStep', () => {
+describe('DataLoaders.Components.CollectorsWizard.Select.SelectCollectorsStep', () => {
   describe('if there are no plugins selected', () => {
     it('renders streaming selector with buttons', () => {
       const wrapper = setup({
@@ -62,7 +62,7 @@ describe('DataLoaders.Components.SelectionStep.SelectCollectorsStep', () => {
   })
 
   describe('if there are plugins selected', () => {
-    it('renders back and next button with correct status', () => {
+    it('renders next button with correct status', () => {
       const wrapper = setup({
         type: DataLoaderType.Streaming,
         currentStepIndex: 0,

@@ -92,7 +92,6 @@ class BucketList extends PureComponent<Props & WithRouterProps, State> {
         <DataLoadersWizard
           visible={this.isDataLoadersWizardVisible}
           onCompleteSetup={this.handleDismissDataLoaders}
-          bucket={this.bucket}
           buckets={buckets}
           {...this.startingValues}
         />
